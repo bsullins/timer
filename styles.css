@@ -338,9 +338,14 @@ body {
 }
 
 @media (max-width: 900px) {
+  .time {
+    font-size: min(30vw, 12rem);
+    line-height: 1;
+  }
   .layout {
     grid-template-columns: 1fr;
     min-height: 100vh;
+    padding: 6px;
   }
 
   .page {
@@ -351,7 +356,7 @@ body {
 
   .stage,
   .panel {
-    padding: 24px;
+    padding: 18px;
   }
 
   .stage {
