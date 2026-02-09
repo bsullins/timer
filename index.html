@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ttimer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <main class="layout">
+        <section class="stage" aria-live="polite">
+          <div class="phase" id="phaseLabel">Idle</div>
+          <div class="time" id="timeDisplay">00:00</div>
+          <div class="round" id="roundLabel">Round 0 of 0</div>
+          <div class="progress" aria-hidden="true">
+            <div class="progress-bar" id="progressBar"></div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="startBtn">Start</button>
+            <button class="btn ghost" id="pauseBtn" disabled>Pause</button>
+            <button class="btn ghost" id="resetBtn">Reset</button>
+          </div>
+        </section>
+
+        <aside class="panel">
+          <h2>Setup</h2>
+          <div class="grid">
+            <label class="field">
+              <span>Rounds</span>
+              <input id="roundsInput" type="number" min="1" max="50" step="1" value="8" />
+            </label>
+            <label class="field">
+              <span>Work (sec)</span>
+              <input id="workInput" type="number" min="1" max="600" step="1" value="20" />
+            </label>
+            <label class="field">
+              <span>Rest (sec)</span>
+              <input id="restInput" type="number" min="0" max="600" step="1" value="10" />
+            </label>
+          </div>
+
+          <div class="presets">
+            <p class="label">Presets</p>
+            <div class="preset-list">
+              <button
+                class="btn ghost"
+                type="button"
+                data-preset
+                data-rounds="8"
+                data-work="20"
+                data-rest="10"
+              >
+                Workout
+              </button>
+              <button
+                class="btn ghost"
+                type="button"
+                data-preset
+                data-rounds="5"
+                data-work="60"
+                data-rest="10"
+              >
+                Stretching
+              </button>
+              <button
+                class="btn ghost"
+                type="button"
+                data-preset
+                data-rounds="8"
+                data-work="120"
+                data-rest="10"
+              >
+                Long stretch
+              </button>
+            </div>
+          </div>
+
+          <div class="toggles">
+            <label class="toggle">
+              <input id="soundToggle" type="checkbox" checked />
+              <span>Sound cues</span>
+            </label>
+            <label class="toggle">
+              <input id="vibrateToggle" type="checkbox" />
+              <span>Vibrate cues</span>
+            </label>
+          </div>
+
+          <div class="meta">
+            <p id="totalTime">Total time: 00:00</p>
+            <p class="hint">Sound starts after a button press.</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
