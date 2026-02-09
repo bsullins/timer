@@ -6,20 +6,26 @@ const elements = {
   startBtn: document.getElementById("startBtn"),
   pauseBtn: document.getElementById("pauseBtn"),
   resetBtn: document.getElementById("resetBtn"),
+  menuBtn: document.getElementById("menuBtn"),
+  setupPanel: document.getElementById("setupPanel"),
+  panelCloseBtn: document.getElementById("panelCloseBtn"),
+  panelBackdrop: document.getElementById("panelBackdrop"),
   roundsInput: document.getElementById("roundsInput"),
   workInput: document.getElementById("workInput"),
   restInput: document.getElementById("restInput"),
+  volumeInput: document.getElementById("volumeInput"),
   soundToggle: document.getElementById("soundToggle"),
   vibrateToggle: document.getElementById("vibrateToggle"),
   totalTime: document.getElementById("totalTime"),
 };
 
 const DEFAULTS = {
-  rounds: 8,
-  work: 20,
+  rounds: 5,
+  work: 60,
   rest: 10,
   sound: true,
   vibrate: false,
+  volume: 0.6,
 };
 
 const state = {
@@ -36,7 +42,10 @@ const state = {
   timerId: null,
   sound: DEFAULTS.sound,
   vibrate: DEFAULTS.vibrate,
+  volume: DEFAULTS.volume,
 };
+
+const presetButtons = Array.from(document.querySelectorAll("[data-preset]"));
 
 let audioContext = null;
 
@@ -58,6 +67,14 @@ const sanitizeNumber = (value, min, max, fallback) => {
   return Math.min(Math.max(parsed, min), max);
 };
 
+const sanitizeFloat = (value, min, max, fallback) => {
+  const parsed = Number.parseFloat(value);
+  if (Number.isNaN(parsed)) {
+    return fallback;
+  }
+  return Math.min(Math.max(parsed, min), max);
+};
+
 const saveSettings = () => {
   const payload = {
     rounds: state.rounds,
@@ -65,6 +82,7 @@ const saveSettings = () => {
     rest: state.rest,
     sound: state.sound,
     vibrate: state.vibrate,
+    volume: state.volume,
   };
   localStorage.setItem("ttimer.settings", JSON.stringify(payload));
 };
@@ -81,6 +99,7 @@ const loadSettings = () => {
     state.rest = sanitizeNumber(parsed.rest, 0, 600, DEFAULTS.rest);
     state.sound = Boolean(parsed.sound);
     state.vibrate = Boolean(parsed.vibrate);
+    state.volume = sanitizeFloat(parsed.volume, 0, 1, DEFAULTS.volume);
   } catch (error) {
     console.warn("Failed to load settings", error);
   }
@@ -90,8 +109,21 @@ const updateInputs = () => {
   elements.roundsInput.value = state.rounds;
   elements.workInput.value = state.work;
   elements.restInput.value = state.rest;
+  elements.volumeInput.value = state.volume;
   elements.soundToggle.checked = state.sound;
   elements.vibrateToggle.checked = state.vibrate;
+  updatePresetHighlight();
+};
+
+const updatePresetHighlight = () => {
+  presetButtons.forEach((button) => {
+    const rounds = sanitizeNumber(button.dataset.rounds, 1, 50, state.rounds);
+    const work = sanitizeNumber(button.dataset.work, 1, 600, state.work);
+    const rest = sanitizeNumber(button.dataset.rest, 0, 600, state.rest);
+    const isMatch =
+      rounds === state.rounds && work === state.work && rest === state.rest;
+    button.classList.toggle("is-active", isMatch);
+  });
 };
 
 const updateTotalTime = () => {
@@ -114,6 +146,18 @@ const updateUI = () => {
   elements.startBtn.textContent = state.running && state.paused ? "Resume" : "Start";
 };
 
+const setPanelOpen = (open) => {
+  const next = Boolean(open);
+  elements.setupPanel.classList.toggle("is-open", next);
+  elements.panelBackdrop.classList.toggle("is-open", next);
+  elements.menuBtn.setAttribute("aria-expanded", String(next));
+};
+
+const togglePanel = () => {
+  const isOpen = elements.setupPanel.classList.contains("is-open");
+  setPanelOpen(!isOpen);
+};
+
 const setPhase = (phase, duration) => {
   state.phase = phase;
   state.duration = duration;
@@ -132,7 +176,7 @@ const cue = (phase) => {
   }
 };
 
-const playBeep = (phase) => {
+const playTone = (frequency) => {
   if (!audioContext) {
     audioContext = new AudioContext();
   }
@@ -142,11 +186,10 @@ const playBeep = (phase) => {
   const now = audioContext.currentTime;
 
   oscillator.type = "sine";
-  oscillator.frequency.value =
-    phase === "work" ? 620 : phase === "rest" ? 440 : 300;
+  oscillator.frequency.value = frequency;
 
   gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(0.3, now + 0.02);
+  gain.gain.linearRampToValueAtTime(state.volume, now + 0.02);
   gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
 
   oscillator.connect(gain);
@@ -154,6 +197,11 @@ const playBeep = (phase) => {
 
   oscillator.start(now);
   oscillator.stop(now + 0.18);
+};
+
+const playBeep = (phase) => {
+  const frequency = phase === "work" ? 620 : phase === "rest" ? 440 : 300;
+  playTone(frequency);
 };
 
 const vibrate = (phase) => {
@@ -192,6 +240,15 @@ const startTimerLoop = () => {
     if (remaining !== state.remaining) {
       state.remaining = remaining;
       updateUI();
+
+      if (
+        state.sound &&
+        (state.phase === "work" || state.phase === "rest") &&
+        remaining > 0 &&
+        remaining <= 3
+      ) {
+        playTone(220);
+      }
     }
 
     if (remaining === 0) {
@@ -270,6 +327,7 @@ const handleSettingsChange = () => {
   state.rounds = sanitizeNumber(elements.roundsInput.value, 1, 50, state.rounds);
   state.work = sanitizeNumber(elements.workInput.value, 1, 600, state.work);
   state.rest = sanitizeNumber(elements.restInput.value, 0, 600, state.rest);
+  state.volume = sanitizeFloat(elements.volumeInput.value, 0, 1, state.volume);
   state.sound = elements.soundToggle.checked;
   state.vibrate = elements.vibrateToggle.checked;
   updateInputs();
@@ -304,13 +362,25 @@ const init = () => {
   updateTotalTime();
   updateUI();
 
+  setPanelOpen(false);
+
   elements.startBtn.addEventListener("click", startWorkout);
   elements.pauseBtn.addEventListener("click", pauseWorkout);
   elements.resetBtn.addEventListener("click", resetWorkout);
 
+  elements.menuBtn.addEventListener("click", togglePanel);
+  elements.panelCloseBtn.addEventListener("click", () => setPanelOpen(false));
+  elements.panelBackdrop.addEventListener("click", () => setPanelOpen(false));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setPanelOpen(false);
+    }
+  });
+
   elements.roundsInput.addEventListener("change", handleSettingsChange);
   elements.workInput.addEventListener("change", handleSettingsChange);
   elements.restInput.addEventListener("change", handleSettingsChange);
+  elements.volumeInput.addEventListener("input", handleSettingsChange);
   elements.soundToggle.addEventListener("change", handleSettingsChange);
   elements.vibrateToggle.addEventListener("change", handleSettingsChange);
 
