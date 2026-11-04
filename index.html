@@ -39,6 +39,18 @@
             <button class="btn ghost" id="pauseBtn" disabled>Pause</button>
             <button class="btn ghost" id="resetBtn">Reset</button>
           </div>
+          <section id="golfGuide" hidden aria-label="Current golf stretch">
+            <div id="golfDrawing"></div>
+            <p class="label" id="golfSide"></p>
+            <h2 id="golfTitle"></h2>
+            <p id="golfDescription"></p>
+            <a id="golfDemo" target="_blank" rel="noopener">Watch this movement ↗</a>
+            <div class="actions golf-navigation">
+              <button class="btn ghost" id="golfPrevious" aria-label="Previous stretch">← Previous</button>
+              <button class="btn ghost" id="golfNext" aria-label="Next stretch">Next →</button>
+            </div>
+            <p class="hint">17 segments · 20:44. Follows <a href="https://www.youtube.com/watch?v=PO2CMKSD6NE" target="_blank" rel="noopener">Tom Merrick’s golf mobility routine</a>. Timing includes setup and transitions. Optional cushions or blocks can support positions.</p>
+          </section>
           <div class="presets presets-inline">
             <p class="label">Presets</p>
             <div class="preset-list">
@@ -72,6 +84,7 @@
               >
                 Long stretch
               </button>
+              <button class="btn ghost" type="button" id="golfPreset" aria-pressed="false">Golf stretch</button>
             </div>
           </div>
         </section>
@@ -122,6 +135,7 @@
       </main>
     </div>
 
+    <script src="golf.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
