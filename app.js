@@ -29,6 +29,8 @@ const DEFAULTS = {
 };
 
 const state = {
+  golf: false,
+  golfIndex: 0,
   running: false,
   paused: false,
   phase: "idle",
@@ -121,20 +123,21 @@ const updatePresetHighlight = () => {
     const work = sanitizeNumber(button.dataset.work, 1, 600, state.work);
     const rest = sanitizeNumber(button.dataset.rest, 0, 600, state.rest);
     const isMatch =
-      rounds === state.rounds && work === state.work && rest === state.rest;
+      !state.golf && rounds === state.rounds && work === state.work && rest === state.rest;
     button.classList.toggle("is-active", isMatch);
   });
 };
 
 const updateTotalTime = () => {
   const total = state.rounds * (state.work + state.rest);
-  elements.totalTime.textContent = `Total time: ${formatTime(total)}`;
+  elements.totalTime.textContent = `Total time: ${formatTime(state.golf ? 1244 : total)}`;
 };
 
 const updateUI = () => {
-  elements.phaseLabel.textContent = state.phase.toUpperCase();
+  elements.phaseLabel.textContent = state.golf && state.phase !== "complete" ? "GOLF STRETCH" : state.phase.toUpperCase();
   elements.timeDisplay.textContent = formatTime(state.remaining);
-  elements.roundLabel.textContent = `Round ${state.round} of ${state.rounds}`;
+  elements.roundLabel.textContent = state.golf ? `Movement ${state.golfIndex + 1} of ${golfRoutine.length}` : `Round ${state.round} of ${state.rounds}`;
+  updateGolfGuide();
 
   const progress =
     state.duration > 0
@@ -258,6 +261,20 @@ const startTimerLoop = () => {
 };
 
 const handlePhaseComplete = () => {
+  if (state.golf) {
+    if (state.golfIndex < golfRoutine.length - 1) {
+      state.golfIndex += 1;
+      setPhase("work", golfRoutine[state.golfIndex].duration);
+    } else {
+      stopTimer();
+      state.phase = "complete";
+      state.remaining = 0;
+      state.duration = 0;
+      cue("complete");
+      updateUI();
+    }
+    return;
+  }
   if (state.phase === "work") {
     if (state.rest > 0) {
       setPhase("rest", state.rest);
@@ -302,7 +319,8 @@ const startWorkout = () => {
   state.running = true;
   state.paused = false;
   state.round = 1;
-  setPhase("work", state.work);
+  if (state.golf && state.phase === "complete") state.golfIndex = 0;
+  setPhase("work", state.golf ? golfRoutine[state.golfIndex].duration : state.work);
   startTimerLoop();
 };
 
@@ -319,7 +337,9 @@ const resetWorkout = () => {
   state.phase = "idle";
   state.round = 0;
   state.duration = 0;
-  state.remaining = 0;
+  state.remaining = state.golf ? golfRoutine[0].duration : 0;
+  state.duration = state.golf ? golfRoutine[0].duration : 0;
+  state.golfIndex = 0;
   updateUI();
 };
 
@@ -346,6 +366,7 @@ const applyPreset = (event) => {
   const rest = sanitizeNumber(button.dataset.rest, 0, 600, state.rest);
 
   stopTimer();
+  state.golf = false;
   state.rounds = rounds;
   state.work = work;
   state.rest = rest;
@@ -356,7 +377,42 @@ const applyPreset = (event) => {
   resetWorkout();
 };
 
+const updateGolfGuide = () => {
+  document.getElementById("golfGuide").hidden = !state.golf;
+  const preset = document.getElementById("golfPreset");
+  preset.classList.toggle("is-active", state.golf);
+  preset.setAttribute("aria-pressed", String(state.golf));
+  if (!state.golf) return;
+  const s = golfRoutine[state.golfIndex];
+  document.getElementById("golfSide").textContent = `${s.group} · ${s.side}`;
+  document.getElementById("golfTitle").textContent = s.title;
+  document.getElementById("golfDescription").textContent = s.description;
+  document.getElementById("golfDemo").href = `https://www.youtube.com/watch?v=PO2CMKSD6NE&t=${s.start}s`;
+  const mirror = /Right arm|Left arm through|Left side|Left leg forward|Right rear hip|Left foot/.test(s.side);
+  document.getElementById("golfDrawing").innerHTML = `<svg viewBox="0 0 320 190" role="img" aria-label="${s.title}: ${s.side}"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" ${mirror ? 'transform="translate(320 0) scale(-1 1)"' : ''}><path d="${golfPoses[s.pose]}"/></g></svg>`;
+  document.getElementById("golfPrevious").disabled = state.golfIndex === 0;
+  document.getElementById("golfNext").disabled = state.golfIndex === golfRoutine.length - 1;
+};
+
+const jumpGolf = (offset) => {
+  const next = state.golfIndex + offset;
+  if (!state.golf || next < 0 || next >= golfRoutine.length) return;
+  stopTimer();
+  state.golfIndex = next;
+  state.phase = "idle";
+  state.duration = state.remaining = golfRoutine[next].duration;
+  updateUI();
+};
+
 const init = () => {
+  document.getElementById("golfPreset").addEventListener("click", () => {
+    state.golf = true;
+    resetWorkout();
+    updatePresetHighlight();
+    updateTotalTime();
+  });
+  document.getElementById("golfPrevious").addEventListener("click", () => jumpGolf(-1));
+  document.getElementById("golfNext").addEventListener("click", () => jumpGolf(1));
   loadSettings();
   updateInputs();
   updateTotalTime();
