@@ -388,8 +388,7 @@ const updateGolfGuide = () => {
   document.getElementById("golfTitle").textContent = s.title;
   document.getElementById("golfDescription").textContent = s.description;
   document.getElementById("golfDemo").href = `https://www.youtube.com/watch?v=PO2CMKSD6NE&t=${s.start}s`;
-  const mirror = /Right arm|Left arm through|Left side|Left leg forward|Right rear hip|Left foot/.test(s.side);
-  document.getElementById("golfDrawing").innerHTML = `<svg viewBox="0 0 320 190" role="img" aria-label="${s.title}: ${s.side}"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" ${mirror ? 'transform="translate(320 0) scale(-1 1)"' : ''}><path d="${golfPoses[s.pose]}"/></g></svg>`;
+  document.getElementById("golfDrawing").innerHTML = golfIllustration(s);
   document.getElementById("golfPrevious").disabled = state.golfIndex === 0;
   document.getElementById("golfNext").disabled = state.golfIndex === golfRoutine.length - 1;
 };
