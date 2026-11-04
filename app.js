@@ -130,7 +130,7 @@ const updatePresetHighlight = () => {
 
 const updateTotalTime = () => {
   const total = state.rounds * (state.work + state.rest);
-  elements.totalTime.textContent = `Total time: ${formatTime(state.golf ? 1244 : total)}`;
+  elements.totalTime.textContent = `Total time: ${formatTime(state.golf ? golfTotalSeconds : total)}`;
 };
 
 const updateUI = () => {
@@ -385,6 +385,8 @@ const updateGolfGuide = () => {
   if (!state.golf) return;
   const s = golfRoutine[state.golfIndex];
   document.getElementById("golfSide").textContent = `${s.group} · ${s.side}`;
+  document.getElementById("golfPrescription").textContent = s.prescription;
+  document.getElementById("golfRepCue").textContent = state.phase === 'complete' ? 'Routine complete' : golfRepCue(s,state.remaining);
   document.getElementById("golfTitle").textContent = s.title;
   document.getElementById("golfDescription").textContent = s.description;
   document.getElementById("golfDemo").href = `https://www.youtube.com/watch?v=PO2CMKSD6NE&t=${s.start}s`;

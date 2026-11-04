@@ -1,7 +1,7 @@
 /* Bump this version and update ASSETS whenever the application shell changes. */
-const CACHE = 'bens-timer-offline-v1';
+const CACHE = 'bens-timer-offline-v2';
 const BASE = new URL('./', self.location.href);
-const ASSETS = ['index.html', 'styles.css?v=3', 'golf.js?v=3', 'app.js?v=3',
+const ASSETS = ['index.html', 'styles.css?v=4', 'golf.js?v=4', 'app.js?v=4',
   'offline.js?v=1', 'assets/golf-mobility.jpg'].map(path => new URL(path, BASE).href);
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

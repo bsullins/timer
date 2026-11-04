@@ -390,3 +390,5 @@ body {
 #golfDrawing { min-height: 0; margin: 12px auto 20px; }
 #golfDrawing svg.golf-artwork { display: block; width: 100%; height: 330px; max-height: none; overflow: hidden; }
 @media (max-width: 600px) { #golfDrawing svg.golf-artwork { height: 280px; } }
+
+.golf-rep-cue { font-size: 1.1rem; font-weight: 600; min-height: 1.5em; color: #c0d9a8; }

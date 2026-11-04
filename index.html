@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=3" />
+    <link rel="stylesheet" href="styles.css?v=4" />
       <style>.offline-status { text-align:center; font-size:.8rem; color:#b7b7b7; padding:0 18px 18px; }</style>
   </head>
   <body>
@@ -44,13 +44,15 @@
             <div id="golfDrawing"></div>
             <p class="label" id="golfSide"></p>
             <h2 id="golfTitle"></h2>
+            <p id="golfPrescription" class="hint"></p>
+            <p id="golfRepCue" class="golf-rep-cue" aria-live="polite" aria-atomic="true"></p>
             <p id="golfDescription"></p>
             <a id="golfDemo" target="_blank" rel="noopener">Watch this movement ↗</a>
             <div class="actions golf-navigation">
               <button class="btn ghost" id="golfPrevious" aria-label="Previous stretch">← Previous</button>
               <button class="btn ghost" id="golfNext" aria-label="Next stretch">Next →</button>
             </div>
-            <p class="hint">17 segments · 20:44. Follows <a href="https://www.youtube.com/watch?v=PO2CMKSD6NE" target="_blank" rel="noopener">Tom Merrick’s golf mobility routine</a>. Timing includes setup and transitions. Optional cushions or blocks can support positions.</p>
+            <p class="hint">17 movements · 12:50 · Each movement ≤ 60 seconds. Based on <a href="https://www.youtube.com/watch?v=PO2CMKSD6NE" target="_blank" rel="noopener">Tom Merrick’s golf mobility routine</a>. Exercise time excludes video explanations. For rep-based movements, follow the paced counter. Optional cushions or blocks can support positions.</p>
           </section>
           <div class="presets presets-inline">
             <p class="label">Presets</p>
@@ -138,7 +140,7 @@
 
     <p id="offlineStatus" class="offline-status" role="status">Saving for offline use…</p>
     <script src="offline.js?v=1"></script>
-    <script src="golf.js?v=3"></script>
-    <script src="app.js?v=3"></script>
+    <script src="golf.js?v=4"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>

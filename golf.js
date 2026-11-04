@@ -14,9 +14,37 @@ const golfRoutine=[
 [899,981,'90/90 glute stretch','Left leg forward','Hips','Swivel to bring your left leg forward, both knees bent to 90°. Hinge over the front leg and reach your right arm across, easing the right shoulder toward the floor.','glute'],
 [981,1028,'90/90 internal rotation','Right rear hip','Hips','Stay in 90/90 and turn your chest toward the rear right knee. Breathe into your belly and gently settle the right hip toward the ground.','internal'],
 [1028,1141,'Alternating hamstring stretch','Alternate sides','Hips & hamstrings','Fold forward with bent knees, belly near the thighs. Support your hands on blocks or a chair. Straighten one leg while drawing the opposite knee forward; alternate slowly.','hamstring'],
-[1141,1210,'Low lunge hip opener','Right foot forward','Hips','Bring your right foot beside your hands, back knee down. Let the right knee open outward and the left hip sink gently. Breathe into the hip; hold about 45 seconds after setup.','lunge'],
-[1210,1270,'Low lunge hip opener','Left foot forward','Hips','Bring your left foot beside your hands, back knee down. Allow the left knee to open outward and the right hip to settle toward the floor. Hold about 45 seconds after setup.','lunge']
-].map(([start,end,title,side,group,description,pose])=>({start,duration:end-start,title,side,group,description,pose}));
+[1141,1210,'Low lunge hip opener','Right foot forward','Hips','Bring your right foot beside your hands, back knee down. Let the right knee open outward and the left hip sink gently. Breathe into the hip; hold for 45 seconds.','lunge'],
+[1210,1270,'Low lunge hip opener','Left foot forward','Hips','Bring your left foot beside your hands, back knee down. Allow the left knee to open outward and the right hip to settle toward the floor. Hold for 45 seconds.','lunge']
+].map(([start,end,title,side,group,description,pose])=>({start,title,side,group,description,pose}));
+// Exercise prescriptions, excluding the video's explanations and setup time.
+// Rotation/plank cadence: 5-second effort + 5 seconds to lower and return.
+// Chest cadence: 15 seconds to settle, 5-second gentle press, 10-second release.
+const golfTiming = {
+ neck: { duration:60, prescription:'60 seconds · alternate with each breath' },
+ chest: { duration:30, prescription:'15s settle · 5s gentle press · 10s release' },
+ rotate: { duration:50, reps:5, cycle:10, hold:5, prescription:'5 reps · 5s hold + 5s lower and return' },
+ thread: { duration:30, prescription:'30-second relaxed hold' },
+ plank: { duration:50, reps:5, cycle:10, hold:5, prescription:'5 reps · 5s hold + 5s lower and return' },
+ swivel: { duration:60, reps:10, cycle:6, prescription:'10 alternating reps · 6 seconds per side' },
+ glute: { duration:60, prescription:'60-second hold' },
+ internal: { duration:30, prescription:'30-second hold' },
+ hamstring: { duration:60, prescription:'60 seconds · alternate slowly' },
+ lunge: { duration:45, prescription:'45-second hold' }
+};
+golfRoutine.forEach(s => Object.assign(s, golfTiming[s.pose]));
+const golfTotalSeconds = golfRoutine.reduce((total,s) => total+s.duration,0);
+function golfRepCue(s, remaining) {
+ const elapsed = Math.min(s.duration, Math.max(0,s.duration-remaining));
+ if(s.reps) {
+  const rep = Math.min(s.reps,Math.floor(elapsed/s.cycle)+1);
+  if(s.pose==='swivel') return `Rep ${rep} of ${s.reps} · ${rep%2 ? 'First side' : 'Other side'}`;
+  const part=elapsed%s.cycle;
+  return `Rep ${rep} of ${s.reps} · ${part<s.hold ? 'Hold' : 'Lower & return'}`;
+ }
+ if(s.pose==='chest') return elapsed<15 ? 'Settle into the stretch' : elapsed<20 ? 'Gently press hand down' : 'Release & breathe';
+ return s.pose === 'neck' ? 'Switch with each breath' : s.pose === 'hamstring' ? 'Alternate sides slowly' : 'Breathe slowly · ease into the stretch';
+}
 // Detailed shaded illustrations share one image sheet; each viewport shows a single pose.
 const golfArtwork = {
  neck: [0,18,365,390], chest: [367,180,360,225],
