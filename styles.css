@@ -373,3 +373,15 @@ body {
     border-radius: 0;
   }
 }
+
+/* Guided golf mobility program. */
+[hidden] { display: none !important; }
+#golfGuide { width: min(100%, 620px); border-top: 1px solid var(--line); padding-top: 16px; }
+#golfDrawing { height: 190px; }
+#golfDrawing svg { width: 100%; height: 100%; }
+#golfSide { color: var(--ink-muted); font-size: .85rem; }
+#golfTitle { font-size: 1.5rem; margin: 10px 0; }
+#golfDescription { line-height: 1.6; color: var(--ink-muted); }
+#golfGuide a { color: var(--ink); text-underline-offset: 3px; }
+.golf-navigation { margin: 20px 0; }
+#golfGuide .hint { line-height: 1.6; color: var(--ink-muted); }
