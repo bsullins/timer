@@ -377,8 +377,8 @@ body {
 /* Guided golf mobility program. */
 [hidden] { display: none !important; }
 #golfGuide { width: min(100%, 620px); border-top: 1px solid var(--line); padding-top: 16px; }
-#golfDrawing { height: 190px; }
-#golfDrawing svg { width: 100%; height: 100%; }
+#golfDrawing { height: auto; min-height: 190px; }
+#golfDrawing svg { display: block; width: 100%; height: auto; max-height: 310px; }
 #golfSide { color: var(--ink-muted); font-size: .85rem; }
 #golfTitle { font-size: 1.5rem; margin: 10px 0; }
 #golfDescription { line-height: 1.6; color: var(--ink-muted); }
